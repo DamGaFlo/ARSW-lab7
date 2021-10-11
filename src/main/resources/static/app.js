@@ -1,4 +1,5 @@
 var app = (function () {
+    var numeroSala=0;
 
     class Point{
         constructor(x,y){
@@ -28,16 +29,17 @@ var app = (function () {
     };
 
 
-    var connectAndSubscribe = function () {
+    var connectAndSubscribe = function (nSala) {
         console.info('Connecting to WS...');
         var socket = new SockJS('/stompendpoint');
         stompClient = Stomp.over(socket);
         
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint', function (message) {
+            console.log('Connected_: ' + frame);
+            stompClient.subscribe('/topic/newpoint'+nSala, function (message) {
                 var ptResive=JSON.parse(message.body);
+                console.log(ptResive)
                 addPointToCanvas(ptResive)
 
 
@@ -56,7 +58,7 @@ var app = (function () {
         });
     }
     var publishPoint = function(pt){
-        stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
+        stompClient.send("/topic/newpoint"+numeroSala, {}, JSON.stringify(pt));
     }
     
     
@@ -67,18 +69,13 @@ var app = (function () {
             var can = document.getElementById("canvas");
             
             //websocket connection
-            connectAndSubscribe();
+            //connectAndSubscribe();
             eListener();
         },
 
-        publishPoint: function(px,py){
-            var pt=new Point(px,py);
-            console.info("publishing point at "+pt);
-            //addPointToCanvas(pt);
-
-            //publicar el evento
-
-            publishPoint(pt)
+        conectarSocket: function(nSala){
+            numeroSala=nSala;
+            connectAndSubscribe(nSala)
         },
 
         disconnect: function () {
