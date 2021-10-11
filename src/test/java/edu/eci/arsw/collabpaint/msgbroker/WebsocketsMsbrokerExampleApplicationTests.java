@@ -1,4 +1,4 @@
-package edu.eci.arsw.msgbroker;
+package edu.eci.arsw.collabpaint.msgbroker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
