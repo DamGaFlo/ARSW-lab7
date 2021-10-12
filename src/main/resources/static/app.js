@@ -7,6 +7,11 @@ var app = (function () {
             this.y=y;
         }        
     }
+    class Polygon{
+        constructor(points) {
+            this.points = points;
+        }
+    }
     
     var stompClient = null;
 
@@ -17,6 +22,28 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
     };
+
+    var addPolyToCanvas = function (poly){
+        var c = document.getElementById("canvas");
+        var ctx = c.getContext("2d");
+        ctx.beginPath();
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0,c.width,c.height);
+
+        var points = poly.points;
+
+        console.log(points);
+        if(points.length!=0) {
+
+                ctx.moveTo(points[0].x, points[0].y);
+                points.forEach(function (point) {
+                    ctx.lineTo(point.x, point.y)
+                    ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);2
+                });
+                ctx.stroke();
+            }
+
+    }
     
     
     var getMousePosition = function (evt) {
@@ -43,8 +70,14 @@ var app = (function () {
                 addPointToCanvas(ptResive)
 
 
-                
             });
+            stompClient.subscribe('/topic/newpolygon'+nSala, function (message) {
+                var poliResive=JSON.parse(message.body);
+                console.log(poliResive)
+                addPolyToCanvas(poliResive)
+
+            });
+
         });
 
     };
@@ -58,7 +91,7 @@ var app = (function () {
         });
     }
     var publishPoint = function(pt){
-        stompClient.send("/topic/newpoint"+numeroSala, {}, JSON.stringify(pt));
+        stompClient.send("/app/newpoint"+numeroSala, {}, JSON.stringify(pt));
     }
     
     
